@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Download the mod
+    url: https://github.com/afkbirdgames/tidy-nest/releases/latest
+    about: The latest official release. Only download the mod from this page.
+  - name: Report a security problem privately
+    url: https://github.com/afkbirdgames/tidy-nest/security
+    about: For security problems, please don't open a public issue.

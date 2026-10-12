@@ -1,0 +1,71 @@
+Tidy Nest License
+
+Copyright (c) 2026 afkbird (AVIX-afk). All rights reserved, except as allowed below.
+
+This license covers the Tidy Nest mod for Minecraft: its source code, jars, textures, documentation,
+screenshots and updater scripts (together, "the Mod").
+
+Official home: https://github.com/afkbirdgames/tidy-nest
+
+In short: play it, stream it, run it on any server and put it in modpacks, as long as you credit
+the author and point people to the official home. The author makes and publishes the versions.
+Changes go through the official repository, and nobody else publishes their own version.
+
+
+1. YOU MAY, FREE OF CHARGE
+
+  a) Download, install and play the Mod, in single player and on any server, public or private,
+     including servers that charge for access or ranks.
+  b) Show the Mod in videos, streams, screenshots, articles and reviews, and monetise that
+     content. A link to the official home in the description is appreciated.
+  c) Include the unmodified official jar in a modpack or server pack, on any platform, if the
+     pack credits the Mod and links to its official home.
+  d) Change the Mod for your own private use, such as tweaking a value for your own world or
+     server. You may not share or publish the changed version (see section 2).
+  e) Suggest changes and report bugs by opening issues on the official repository (see
+     section 3).
+
+
+2. YOU MAY NOT, WITHOUT THE AUTHOR'S WRITTEN PERMISSION
+
+  a) Publish, upload or share a modified version of the Mod, or a fork, port, remake, add-on or
+     "continued" version of it.
+  b) Reuse the Mod's code, textures, models or other assets in another project, or decompile
+     or reverse-engineer the Mod to do so.
+  c) Re-upload the Mod on its own (not inside a modpack) to another website or platform, or
+     present it as your own work.
+  d) Sell the Mod itself, or put it behind a paywall. Charging for a server, or monetising
+     videos and streams, is fine (section 1).
+  e) Remove or change this license, the copyright notice or the author's credit.
+
+Permission for anything in section 2 can be given by the author in writing, for free or under a
+paid agreement, as the author chooses. Ask by opening an issue on the official repository.
+Permission covers only what it explicitly says.
+
+
+3. CONTRIBUTIONS
+
+If you send an issue, idea, bug report or other contribution to the official repository, you
+agree that the author may use, change and publish it as part of the Mod under this license, with
+no payment owed. The author decides what is included and released.
+
+
+4. NO WARRANTY
+
+The Mod is provided "as is", without warranty of any kind. The author is not liable for any
+claim, damage or loss arising from its use, including lost or damaged worlds. Back up your
+worlds.
+
+
+5. ENDING THIS LICENSE
+
+If you break this license, your rights under it end automatically. This does not affect other
+people who received the Mod from you correctly under section 1.
+
+
+6. OTHER PEOPLE'S WORK
+
+Minecraft is a trademark of Mojang Synergies AB. The Mod is not an official Minecraft product and
+is not approved by or associated with Mojang or Microsoft. The Mod contains no Mojang assets.
+Pictures of the game in the Mod's documentation show Minecraft's own textures. Fabric Loader
+and Fabric API are separate projects under their own licenses and are not part of the Mod.

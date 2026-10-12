@@ -1,0 +1,137 @@
+# Publishes a release when a new mod jar is pushed to release/.
+#
+# To publish: replace the jar in release/ with the new tidynest-X.Y.Z.jar (and its .sig), add a
+# "## X.Y.Z" section to CHANGELOG.md, and push to main. This workflow then:
+#   1. reads the version from the jar and skips if that version is already released
+#   2. checks the jar (it must be Tidy Nest, named after its version) and the changelog
+#   3. checks the jar's signature (release/tidynest-X.Y.Z.jar.sig) against updater/release-signing-key.pem,
+#      and that the updater checks downloads against the same key
+#   4. checks the updater points at this repository and packages it
+#   5. creates the tag vX.Y.Z and the release, with the changelog section as its notes and the jar,
+#      its .sig, tidynest-updater.zip and SHA256SUMS.txt (checksums of the jar and the zip) attached
+#   6. once the new release is up, removes every older release and its tag, so the Releases page
+#      only ever offers the current version
+# It can also be started by hand from the Actions tab ("Run workflow").
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: ["release/**", "CHANGELOG.md"]
+  workflow_dispatch:
+
+# Nothing by default; the release job alone may write releases.
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    # Only the official repository publishes releases (not forks or copies).
+    if: github.repository == 'afkbirdgames/tidy-nest'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # Third-party actions are pinned to exact commits, not movable tags.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check the jar and the changelog
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import glob, json, os, re, sys, zipfile
+          jars = glob.glob("release/tidynest-*.jar")
+          if len(jars) != 1:
+              sys.exit(f"::error::release/ must hold exactly one tidynest-<version>.jar (found {len(jars)})")
+          info = json.loads(zipfile.ZipFile(jars[0]).read("fabric.mod.json"))
+          version = info["version"]
+          if info.get("id") != "tidynest" or os.path.basename(jars[0]) != f"tidynest-{version}.jar":
+              sys.exit(f"::error::{jars[0]} is not tidynest-{version}.jar of Tidy Nest")
+          if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+              sys.exit(f"::error::{version} is a test build; only plain X.Y.Z versions are released")
+          text = open("CHANGELOG.md", encoding="utf-8").read()
+          m = re.search(rf"^## {re.escape(version)}\b.*?$\n(.*?)(?=^## |\Z)", text, re.M | re.S)
+          with open(os.environ["GITHUB_ENV"], "a") as env:
+              env.write(f"VERSION={version}\nJAR={jars[0]}\n")
+          notes = (m.group(1).strip() + "\n\n") if m else ""
+          notes += ("**Install:** Minecraft 26.3 with Fabric Loader and Fabric API. Put the jar in your `mods` folder, "
+                    "replacing any older `tidynest-*.jar`, or run the updater. Optional on servers: with it, the server "
+                    "sorts in one step.\n")
+          open("release-notes.md", "w", encoding="utf-8").write(notes)
+          if not m:
+              print(f"::warning::CHANGELOG.md has no '## {version}' section; the release will only have install notes")
+          PY
+          if gh release view "v$(grep '^VERSION=' "$GITHUB_ENV" | tail -1 | cut -d= -f2)" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "::notice title=Nothing to release::This version is already released."
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Check the jar is signed with the release key
+        if: env.SKIP != '1'
+        run: |
+          if [ ! -f "$JAR.sig" ]; then
+            echo "::error::$JAR.sig is missing. Sign the jar and put the .sig next to it in release/."
+            exit 1
+          fi
+          tr -d '\r\n' < "$JAR.sig" | base64 -d > "$RUNNER_TEMP/jar.sig"
+          if ! openssl dgst -sha256 -verify updater/release-signing-key.pem -signature "$RUNNER_TEMP/jar.sig" "$JAR"; then
+            echo "::error::$JAR.sig is not a signature of $JAR by updater/release-signing-key.pem"
+            exit 1
+          fi
+          # the updater must check against the same key
+          want=$(openssl rsa -pubin -in updater/release-signing-key.pem -modulus -noout | cut -d= -f2)
+          have=$(sed -n 's/^\$SigningKeyModulus = "\([A-Za-z0-9+/=]*\)".*/\1/p' updater/update-tidynest.ps1 | base64 -d | od -An -tx1 -v | tr -d ' \n' | tr a-f A-F)
+          if [ "$want" != "$have" ] || ! grep -q '^\$SigningKeyExponent = "AQAB"' updater/update-tidynest.ps1; then
+            echo "::error::updater/update-tidynest.ps1 doesn't embed the key in updater/release-signing-key.pem"
+            exit 1
+          fi
+
+      - name: Package the updater (it must point at this repository)
+        if: env.SKIP != '1'
+        run: |
+          if ! grep -q "Id = \"tidynest\"; Name = \"Tidy Nest\"; Repo = \"${GITHUB_REPOSITORY}\"" updater/update-tidynest.ps1; then
+            echo "::error::updater/update-tidynest.ps1 must list Tidy Nest with Repo = \"${GITHUB_REPOSITORY}\""
+            exit 1
+          fi
+          mkdir -p tidynest-updater
+          cp updater/update-tidynest.ps1 updater/update-tidynest.bat updater/README.txt tidynest-updater/
+          zip -j tidynest-updater.zip tidynest-updater/*
+          cp "$JAR" .
+          sha256sum "$(basename "$JAR")" tidynest-updater.zip > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        if: env.SKIP != '1'
+        with:
+          tag_name: v${{ env.VERSION }}
+          target_commitish: ${{ github.sha }}
+          name: Tidy Nest ${{ env.VERSION }}
+          body_path: release-notes.md
+          files: |
+            ${{ env.JAR }}
+            ${{ env.JAR }}.sig
+            tidynest-updater.zip
+            SHA256SUMS.txt
+          make_latest: true
+          fail_on_unmatched_files: true
+
+      # Players should only ever find the current version. Runs only after the new release was
+      # published (any earlier failure stops the job), and checks it exists before removing anything.
+      - name: Remove older releases
+        if: env.SKIP != '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v$VERSION" --jq .id > /dev/null
+          gh api "repos/$GITHUB_REPOSITORY/releases" --paginate --jq ".[] | select(.tag_name != \"v$VERSION\") | \"\(.id) \(.tag_name)\"" |
+          while read -r id tag; do
+            echo "Removing release $tag"
+            gh api -X DELETE "repos/$GITHUB_REPOSITORY/releases/$id"
+            gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/tags/$tag" || echo "::warning::tag $tag was not removed"
+          done
