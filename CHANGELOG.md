@@ -2,6 +2,15 @@
 
 All notable changes to Tidy Nest. It works on any server: installing it on the server too is optional.
 
+## 1.1.0 (2026-10-12)
+
+**Changed**
+- **Like items now stay together, and every sort looks the same.** Inside each group (blocks, food and potions, materials...) items are kept in families: each wood type together (sapling, leaves, log, planks, stairs, fence, door...), all glass and glass panes in every colour, all dyes, a stone with its stairs, slabs and walls, a metal's ore, raw metal, ingot, nugget and block, wool with carpets, all terracotta. Families and their items follow the creative menu's order, so a chest with the same things always comes out the same way.
+- Within a family, the biggest stack still comes first. "The item you have most of first" is gone: it split families apart.
+- Gear (weapons, tools and armour) sorts as before: by type, best material and least worn first.
+
+Install it in your game; on the server it's optional.
+
 ## 1.0.0 (2026-10-12)
 
 First release.

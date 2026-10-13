@@ -15,7 +15,7 @@ Open a chest or your inventory and you'll see a small button with three bars abo
 * **Stacks are merged.** Three half stacks of cobblestone become one full stack and a bit.
 * **Gear comes first**, best first. Weapons and tools are grouped by type (swords, axes, pickaxes, shovels, hoes, bows...), with the best material first and the least worn first. Armour follows, head to feet, then other gear such as shields.
 * **Then blocks, food and potions, materials, other items, and storage** (shulker boxes and bundles) last.
-* **What you have most of comes first** within each group, and each item's biggest stack comes before its smallest.
+* **Like items stay together.** Each wood type together (sapling, leaves, log, planks, stairs, door...), all glass and panes in every colour, all dyes, a stone with its stairs and slabs, an ore with its ingots and nuggets. Families follow the creative menu's order, and each item's biggest stack comes before its smallest.
 * **Your hotbar, armour and off hand never move.** The inventory button sorts the 27 storage slots only, so what you hold and wear stays where you put it.
 * **Shortcuts:** double-click an empty slot (with nothing in your hand) or middle-click any slot to sort its grid without reaching for the button. Middle-click works in survival; in creative it still copies items. Prefer a keyboard key? Set *Sort the area under the mouse* in Controls → Inventory.
 * **The same items always end up in the same order**, so things are where you expect them, and sorting a tidy chest changes nothing.
