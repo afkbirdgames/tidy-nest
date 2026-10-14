@@ -2,6 +2,14 @@
 
 All notable changes to Tidy Nest. It works on any server: installing it on the server too is optional.
 
+## 1.1.1 (2026-10-14)
+
+**Changed**
+- Prismarine (with dark prismarine, shards and crystals), purpur and mud (with packed mud) now each stay together in
+  one family when sorted.
+
+Install it in your game; on the server it's optional.
+
 ## 1.1.0 (2026-10-12)
 
 **Changed**
